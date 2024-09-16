@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Include Firebase Authentication and Firestore Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC0sUp9IJILTAV4Qx7AHK6dugESDF5NWHA",
+            authDomain: "buspartner-3aa7f.firebaseapp.com",
+            projectId: "buspartner-3aa7f",
+            storageBucket: "buspartner-3aa7f.appspot.com",
+            messagingSenderId: "482507801367",
+            appId: "1:482507801367:web:fd3329c1cc6bac15bbed52",
+            measurementId: "G-5J3H0PFV2Y"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        // Initialize Firebase Authentication and Firestore
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <!-- Login Container -->
+    <div id="login-container" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
+        <div class="mb-4">
+            <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="email" placeholder="Email" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-6">
+            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="password" placeholder="Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="flex flex-col items-center mb-4">
+            <button onclick="login()" class="w-full mb-4 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-200">Login</button>
+        </div>
+        <div class="text-center mt-4">
+            <p>Don't have an account? <button onclick="toggleToSignUp()" class="text-indigo-600 hover:underline">Sign Up</button></p>
+        </div>
+    </div>
+
+    <!-- Sign Up Container -->
+    <div id="signup-container" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" style="display: none;">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Sign Up</h2>
+        <div class="mb-4">
+            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" id="username" placeholder="Username" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="signup-email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="signup-email" placeholder="Email" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="vendor" class="block text-sm font-medium text-gray-700">Company Name</label>
+            <input type="text" id="vendor" placeholder="Company Name" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="signup-password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="signup-password" placeholder="Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-6">
+            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" id="confirm-password" placeholder="Confirm Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="flex justify-between items-center mb-4">
+            <button onclick="signUp()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200">Sign Up</button>
+        </div>
+        <div class="text-center mt-4">
+            <p>Already have an account? <button onclick="toggleToLogin()" class="text-indigo-600 hover:underline">Login</button></p>
+        </div>
+    </div>
+
+    <!-- Logout Button (Visible only when logged in) -->
+    <div id="logout-container" class="absolute top-4 right-4" style="display: none;">
+        <button onclick="logout()" class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200">Logout</button>
+    </div>
+
+    <script>
+        // Login function
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+
+                    // Fetch user data from Firestore
+                    return db.collection('users').doc(user.uid).get();
+                })
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        console.log('User data:', userData);
+
+                        // Now you can manage user roles using userData
+                        // Example: Show/hide elements based on user role
+                        if (userData.role === 'admin') {
+                            // Show admin-specific UI elements
+                        }
+
+                        toggleAuthUI(true);
+                    } else {
+                        console.log('No such user data in Firestore');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error logging in:', error);
+                    alert('Login failed: ' + error.message);
+                });
+        }
+
+    // Sign Up function
+function signUp() {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('signup-email').value;
+    const companyName = document.getElementById('vendor').value.toUpperCase(); // Ensure companyName is in uppercase
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    // Validate input fields
+    if (!username || !email || !companyName || !password || !confirmPassword) {
+        alert('All fields are required.');
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        alert('Passwords do not match.');
+        return;
+    }
+
+    // Create user with Firebase Authentication
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+
+            // Store user details in Firestore under companies > companyName > users subcollection
+            return db.collection('companies').doc(companyName).collection('users').doc(user.uid).set({
+                username: username,
+                email: email,
+                role: 'user' // Default role
+            });
+            
+        })
+        .then(() => {
+            console.log('User signed up and data stored in Firestore');
+            toggleAuthUI(true);
+        })
+        .catch((error) => {
+            console.error('Error signing up:', error);
+            alert('Sign up failed: ' + error.message);
+        });
+}
+
+
+        // Logout function
+        function logout() {
+            auth.signOut().then(() => {
+                console.log('User logged out');
+                toggleAuthUI(false);
+            }).catch((error) => {
+                console.error('Error logging out:', error);
+            });
+        }
+
+        // Toggle between login and sign-up forms
+        function toggleToSignUp() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('signup-container').style.display = 'block';
+        }
+
+        function toggleToLogin() {
+            document.getElementById('signup-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+        }
+        
+        // Toggle UI based on auth state
+        function toggleAuthUI(isLoggedIn) {
+            document.getElementById('login-container').style.display = isLoggedIn ? 'none' : 'block';
+            document.getElementById('signup-container').style.display = 'none'; // Hide sign-up when logged in
+            document.getElementById('logout-container').style.display = isLoggedIn ? 'block' : 'none';
+        }
+        
+        // Monitor auth state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                console.log('User is logged in:', user);
+                toggleAuthUI(true);
+            } else {
+                // No user is signed in
+                console.log('No user is logged in');
+                toggleAuthUI(false);
+            }
+        });
+    </script>
+</body>
+</html>

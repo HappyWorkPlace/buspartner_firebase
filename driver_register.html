@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Driver Data Entry</title>
+        <!-- Include Firebase JavaScript SDKs -->
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+        <script type="module" src="firebaseConfig.js"></script>
+        <script src="auth-check.js"></script>
+ 
+        <!-- Your other scripts and styles -->
+        <!-- Tailwind CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+        <!-- SweetAlert2 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+        <!-- SweetAlert2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <!-- XLSX library for Excel file handling -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    </head>
+
+
+<body class="bg-gray-100">
+    
+<div class="max-w-lg mx-auto py-10">
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h2 class="text-2xl font-bold mb-8 text-gray-800 text-center">Driver Data Entry Form</h2>
+        <form id="driver-data-form" class="space-y-4">
+            <div>
+                <label for="empNo" class="text-gray-700 font-medium">EmpNo:</label>
+                <input type="text" id="empNo" name="empNo" required onBlur="checkEmpNo()" class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+
+            <div>
+                <label for="name" class="text-gray-700 font-medium">Name:</label>
+                <input type="text" id="name" name="name" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+
+            <div>
+                <label for="vendor" class="text-gray-700 font-medium">Vendor:</label>
+                <select id="vendor" name="vendor" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+                    <option value="NMB">NMB</option>
+                    <option value="JT">JT</option>
+                    <option value="PP">PP</option>
+                    <option value="PA">PA</option>
+                    <option value="PT">PT</option>
+                    <option value="VR">VR</option>
+                </select>
+                
+            </div>
+
+            <div>
+                <label for="birthDate" class="text-gray-700 font-medium">BirthDate:</label>
+                <input type="date" id="birthDate" name="birthDate" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+
+            <div>
+                <label for="licenceDate" class="text-gray-700 font-medium">Licence Date:</label>
+                <input type="date" id="licenceDate" name="licenceDate" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+
+            <div>
+                <label for="joinDate" class="text-gray-700 font-medium">Join Date:</label>
+                <input type="date" id="joinDate" name="joinDate" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+
+            <div>
+                <label for="licencePic" class="text-gray-700 font-medium">Licence Pic:</label>
+                <input type="file" id="licencePic" name="licencePic" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm">
+            </div>
+
+            <div>
+                <label for="driverPic" class="text-gray-700 font-medium">Driver Pic:</label>
+                <input type="file" id="driverPic" name="driverPic" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm">
+            </div>
+
+            <div>
+                <label for="docFile" class="text-gray-700 font-medium">Doc File:</label>
+                <input type="file" id="docFile" name="docFile" required class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm">
+            </div>
+
+            <div class="flex justify-center mt-6">
+                <button type="button" onclick="submitForm()" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+    <div>
+        <span>
+
+        </span>
+    </div>
+    <div class="bg-white p-6 rounded-lg shadow-lg">
+        <div>
+            <label for="bulkUpload" class="text-gray-700 font-medium">Bulk Upload (Excel):</label>
+            <input type="file" id="bulkUpload" name="bulkUpload" accept=".xlsx" class="mt-1 block w-full rounded-lg border-2 border-gray-300 p-2 shadow-sm">
+        </div>
+        
+        <div class="flex justify-center mt-6">
+            <button type="button" onclick="uploadExcelFile()" class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-semibold shadow-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50">
+                Upload Excel
+            </button>
+        </div>
+    </div>    
+</div>
+<script type="module">
+    import { auth } from './firebaseConfig.js';
+
+
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            console.log('User is logged in:', user);
+
+        } else {
+            console.log('No user is logged in');
+
+        }
+    });
+</script>
+
+<script>
+  // Save data in IndexedDB and Firestore
+  function submitForm() {
+    // Collect form data
+    const empNo = document.getElementById('empNo').value;
+    const name = document.getElementById('name').value;
+    const vendor = document.getElementById('vendor').value;
+    const birthDate = document.getElementById('birthDate').value;
+    const licenceDate = document.getElementById('licenceDate').value;
+    const joinDate = document.getElementById('joinDate').value;
+
+    const licencePicFile = document.getElementById('licencePic').files[0];
+    const driverPicFile = document.getElementById('driverPic').files[0];
+    const docFile = document.getElementById('docFile').files[0];
+
+    if (!empNo || !name || !vendor || !birthDate || !licenceDate || !joinDate || !licencePicFile || !driverPicFile || !docFile) {
+      Swal.fire('Error', 'Please fill out all fields and select all files.', 'error');
+      return;
+    }
+
+    // Save all data to IndexedDB
+    saveToIndexedDB({
+      empNo,
+      name,
+      vendor,
+      birthDate,
+      licenceDate,
+      joinDate,
+      licencePicFile,
+      driverPicFile,
+      docFile
+    });
+
+    // Save non-image data to Firestore
+    saveToFirestore({
+      empNo,
+      name,
+      vendor,
+      birthDate,
+      licenceDate,
+      joinDate
+    });
+  }
+
+  // Function to save data to IndexedDB
+ // Function to convert a file to base64
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+  
+  // Function to save data to IndexedDB
+  function saveToIndexedDB(data) {
+    const request = indexedDB.open('DriverDB', 1);
+  
+    request.onupgradeneeded = function(event) {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('drivers')) {
+        const store = db.createObjectStore('drivers', { keyPath: 'empNo' });
+      }
+    };
+  
+    request.onsuccess = function(event) {
+      const db = event.target.result;
+      
+      // Convert images to base64
+      Promise.all([
+        fileToBase64(data.licencePicFile),
+        fileToBase64(data.driverPicFile),
+        fileToBase64(data.docFile)
+      ]).then(base64Images => {
+        const transaction = db.transaction(['drivers'], 'readwrite');
+        const store = transaction.objectStore('drivers');
+  
+        const driverDataWithImages = {
+          ...data,
+          licencePic: base64Images[0],
+          driverPic: base64Images[1],
+          docFile: base64Images[2]
+        };
+  
+        store.put(driverDataWithImages);
+        transaction.oncomplete = function() {
+          console.log('Driver data saved to IndexedDB');
+          Swal.fire('Success', 'Driver data saved successfully!', 'success');
+        };
+  
+        transaction.onerror = function(event) {
+          console.error('Transaction error:', event.target.error);
+          Swal.fire('Error', 'Failed to save driver data to IndexedDB.', 'error');
+        };
+      }).catch(error => {
+        console.error('Error converting files to base64:', error);
+        Swal.fire('Error', 'Failed to convert files to base64.', 'error');
+      });
+    };
+  
+    request.onerror = function(event) {
+      console.error('IndexedDB error:', event.target.errorCode);
+      Swal.fire('Error', 'Failed to open IndexedDB.', 'error');
+    };
+  }
+  
+// Function to save data to Firestore (excluding images)
+function saveToFirestore(data) {
+    if (!data.empNo) {
+      console.error('Error: Employee number (empNo) is required for saving to Firestore.');
+      Swal.fire('Error', 'Employee number is required for saving to Firestore.', 'error');
+      return;
+    }
+  
+    const dbRef = db.collection('drivers').doc(data.empNo);
+  
+    const dataWithoutImages = { ...data };
+    delete dataWithoutImages.licencePicFile;
+    delete dataWithoutImages.driverPicFile;
+    delete dataWithoutImages.docFile;
+  
+    dbRef.set(dataWithoutImages)
+      .then(() => {
+        console.log('Driver data saved to Firestore');
+        Swal.fire('Success', 'Driver data saved successfully to Firestore!', 'success');
+      })
+      .catch(error => {
+        console.error('Error saving data to Firestore:', error);
+        Swal.fire('Error', 'Failed to save driver data to Firestore.', 'error');
+      });
+  }
+  
+
+  // Check for employee number duplication (optional)
+  function checkEmpNo() {
+    const empNo = document.getElementById('empNo').value;
+    const dbRef = db.collection('drivers').doc(empNo);
+
+    dbRef.get()
+      .then(doc => {
+        if (doc.exists) {
+          Swal.fire('Error', 'Employee number already exists in Firestore.', 'error');
+          document.getElementById('empNo').value = '';
+        }
+      })
+      .catch(error => {
+        console.error('Error checking empNo in Firestore:', error);
+      });
+  }
+  //Upload Excel to Database
+  //empNo, name, vendor, birthDate, licenceDate, joinDate.
+  function uploadExcelFile() {
+    const fileInput = document.getElementById('bulkUpload');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        Swal.fire('Error', 'Please select an Excel file to upload.', 'error');
+        return;
+    }
+
+    // Read the Excel file using FileReader
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+
+        // Assuming the data is in the first sheet
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
+
+        // Convert the worksheet to JSON
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        // Process each row in the JSON data
+        jsonData.forEach(row => {
+            const empNo = row['EmpNo'];
+            const name = row['Name'];
+            const vendor = row['Vendor'];
+            const birthDate = row['BirthDate'];
+            const licenceDate = row['LicenceDate'];
+            const joinDate = row['JoinDate'];
+            
+            // Assuming no images in Excel, only storing the text data
+            const driverData = { empNo, name, vendor, birthDate, licenceDate, joinDate };
+
+            // Save data to IndexedDB
+            saveToIndexedDB(driverData);
+
+            // Save non-image data to Firestore
+            saveToFirestore(driverData);
+        });
+
+        Swal.fire('Success', 'Data uploaded successfully!', 'success');
+    };
+
+    reader.onerror = function(event) {
+        console.error('Error reading Excel file:', event);
+        Swal.fire('Error', 'Failed to read the Excel file.', 'error');
+    };
+
+    // Read the Excel file as an array buffer
+    reader.readAsArrayBuffer(file);
+}
+
+</script>
+</body>
+</html>
