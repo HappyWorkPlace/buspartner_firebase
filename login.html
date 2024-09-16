@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login & Sign Up</title>
     <!-- Tailwind CSS -->
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <!-- Include Firebase Authentication and Firestore Scripts -->
@@ -15,6 +15,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyC0sUp9IJILTAV4Qx7AHK6dugESDF5NWHA",
             authDomain: "buspartner-3aa7f.firebaseapp.com",
+            databaseURL: "https://buspartner-3aa7f-default-rtdb.firebaseio.com",
             projectId: "buspartner-3aa7f",
             storageBucket: "buspartner-3aa7f.appspot.com",
             messagingSenderId: "482507801367",
@@ -26,9 +27,78 @@
         // Initialize Firebase Authentication and Firestore
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Generate a random Company_No consisting of 5 alphanumeric characters
+        function generateCompanyNo() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let companyNo = '';
+            for (let i = 0; i < 5; i++) {
+                companyNo += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return companyNo;
+        }
     </script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <!-- Container for selecting signup type -->
+    <div id="select-signup-type" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" style="display:none;">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Select Sign-Up Type</h2>
+        <button onclick="showEntrepreneurForm()" class="w-full mb-4 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-200">Sign Up as Entrepreneur</button>
+        <button onclick="showUserForm()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200">Sign Up as User</button>
+    </div>
+
+    <!-- Entrepreneur Sign-Up Form -->
+    <div id="entrepreneur-signup-form" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" style="display:none;">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Entrepreneur Sign-Up</h2>
+        <div class="mb-4">
+            <label for="company-name" class="block text-sm font-medium text-gray-700">Company Name</label>
+            <input type="text" id="company-name" placeholder="Company Name" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="entrepreneur-username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" id="entrepreneur-username" placeholder="Username" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="entrepreneur-email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="entrepreneur-email" placeholder="Email" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="entrepreneur-password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="entrepreneur-password" placeholder="Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-6">
+            <label for="entrepreneur-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" id="entrepreneur-confirm-password" placeholder="Confirm Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <button onclick="signUpEntrepreneur()" class="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-200">Sign Up</button>
+    </div>
+
+    <!-- User Sign-Up Form -->
+    <div id="user-signup-form" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" style="display:none;">
+        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">User Sign-Up</h2>
+        <div class="mb-4">
+            <label for="user-username" class="block text-sm font-medium text-gray-700">Username</label>
+            <input type="text" id="user-username" placeholder="Username" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="user-email" class="block text-sm font-medium text-gray-700">Email</label>
+            <input type="email" id="user-email" placeholder="Email" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="user-password" class="block text-sm font-medium text-gray-700">Password</label>
+            <input type="password" id="user-password" placeholder="Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-4">
+            <label for="user-confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
+            <input type="password" id="user-confirm-password" placeholder="Confirm Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <div class="mb-6">
+            <label for="user-company-no" class="block text-sm font-medium text-gray-700">Company No</label>
+            <input type="text" id="user-company-no" placeholder="Company No" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+        </div>
+        <button onclick="signUpUser()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200">Sign Up</button>
+    </div>
 
     <!-- Login Container -->
     <div id="login-container" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
@@ -45,47 +115,133 @@
             <button onclick="login()" class="w-full mb-4 bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-200">Login</button>
         </div>
         <div class="text-center mt-4">
-            <p>Don't have an account? <button onclick="toggleToSignUp()" class="text-indigo-600 hover:underline">Sign Up</button></p>
+            <p>Don't have an account? <button onclick="toggleToSignUpType()" class="text-indigo-600 hover:underline">Sign Up</button></p>
         </div>
     </div>
 
-    <!-- Sign Up Container -->
-    <div id="signup-container" class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md" style="display: none;">
-        <h2 class="text-2xl font-bold mb-6 text-center text-gray-800">Sign Up</h2>
-        <div class="mb-4">
-            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-            <input type="text" id="username" placeholder="Username" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-        </div>
-        <div class="mb-4">
-            <label for="signup-email" class="block text-sm font-medium text-gray-700">Email</label>
-            <input type="email" id="signup-email" placeholder="Email" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-        </div>
-        <div class="mb-4">
-            <label for="vendor" class="block text-sm font-medium text-gray-700">Company Name</label>
-            <input type="text" id="vendor" placeholder="Company Name" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-        </div>
-        <div class="mb-4">
-            <label for="signup-password" class="block text-sm font-medium text-gray-700">Password</label>
-            <input type="password" id="signup-password" placeholder="Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-        </div>
-        <div class="mb-6">
-            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-            <input type="password" id="confirm-password" placeholder="Confirm Password" class="mt-1 block w-full rounded-lg border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
-        </div>
-        <div class="flex justify-between items-center mb-4">
-            <button onclick="signUp()" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200">Sign Up</button>
-        </div>
-        <div class="text-center mt-4">
-            <p>Already have an account? <button onclick="toggleToLogin()" class="text-indigo-600 hover:underline">Login</button></p>
-        </div>
-    </div>
-
-    <!-- Logout Button (Visible only when logged in) -->
+    <!-- Logout Button -->
     <div id="logout-container" class="absolute top-4 right-4" style="display: none;">
         <button onclick="logout()" class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200">Logout</button>
     </div>
 
     <script>
+        // Show the select sign-up type form
+        function toggleToSignUpType() {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('select-signup-type').style.display = 'block';
+        }
+
+        // Show the Entrepreneur Sign-Up form
+        function showEntrepreneurForm() {
+            document.getElementById('select-signup-type').style.display = 'none';
+            document.getElementById('entrepreneur-signup-form').style.display = 'block';
+        }
+
+        // Show the User Sign-Up form
+        function showUserForm() {
+            document.getElementById('select-signup-type').style.display = 'none';
+            document.getElementById('user-signup-form').style.display = 'block';
+        }
+
+        // Entrepreneur Sign-Up function
+        function signUpEntrepreneur() {
+            const companyName = document.getElementById('company-name').value.toUpperCase();
+            const username = document.getElementById('entrepreneur-username').value;
+            const email = document.getElementById('entrepreneur-email').value;
+            const password = document.getElementById('entrepreneur-password').value;
+            const confirmPassword = document.getElementById('entrepreneur-confirm-password').value;
+            const companyNo = generateCompanyNo(); // Generate a random Company_No
+
+            if (!companyName || !username || !email || !password || !confirmPassword) {
+                alert('All fields are required.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            // Check if the generated companyNo is unique
+            db.collection('companies').doc(companyNo).get().then((doc) => {
+                if (doc.exists) {
+                    alert('Error generating unique Company_No. Please try again.');
+                } else {
+                    // Proceed with creating the user and storing data
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            const user = userCredential.user;
+                            // Store company and user data
+                            return db.collection('companies').doc(companyNo).set({
+                                Company_name: companyName,
+                                Company_No: companyNo
+                            }).then(() => {
+                                return db.collection('companies').doc(companyNo).collection('users').doc(user.uid).set({
+                                    username: username,
+                                    email: email,
+                                    role: 'admin',
+                                    Company_No: companyNo // Save the Company_No with the user data
+                                });
+                            });
+                        })
+                        .then(() => {
+                            console.log('Entrepreneur signed up and data stored in Firestore');
+                            toggleAuthUI(true);
+                        })
+                        .catch((error) => {
+                            console.error('Error signing up entrepreneur:', error);
+                            alert('Sign up failed: ' + error.message);
+                        });
+                }
+            });
+        }
+
+        // User Sign-Up function
+        function signUpUser() {
+            const username = document.getElementById('user-username').value;
+            const email = document.getElementById('user-email').value;
+            const password = document.getElementById('user-password').value;
+            const confirmPassword = document.getElementById('user-confirm-password').value;
+            const companyNo = document.getElementById('user-company-no').value.toUpperCase();
+
+            if (!username || !email || !password || !confirmPassword || !companyNo) {
+                alert('All fields are required.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match.');
+                return;
+            }
+
+            // Check if the companyNo exists
+            db.collection('companies').doc(companyNo).get().then((doc) => {
+                if (!doc.exists) {
+                    alert('Invalid Company No. Please check and try again.');
+                } else {
+                    // Proceed with creating the user and storing data
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .then((userCredential) => {
+                            const user = userCredential.user;
+                            return db.collection('companies').doc(companyNo).collection('users').doc(user.uid).set({
+                                username: username,
+                                email: email,
+                                role: 'user',
+                                Company_No: companyNo // Save the Company_No with the user data
+                            });
+                        })
+                        .then(() => {
+                            console.log('User signed up and data stored in Firestore');
+                            toggleAuthUI(true);
+                        })
+                        .catch((error) => {
+                            console.error('Error signing up user:', error);
+                            alert('Sign up failed: ' + error.message);
+                        });
+                }
+            });
+        }
+
         // Login function
         function login() {
             const email = document.getElementById('email').value;
@@ -94,74 +250,14 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-
-                    // Fetch user data from Firestore
-                    return db.collection('users').doc(user.uid).get();
-                })
-                .then((doc) => {
-                    if (doc.exists) {
-                        const userData = doc.data();
-                        console.log('User data:', userData);
-
-                        // Now you can manage user roles using userData
-                        // Example: Show/hide elements based on user role
-                        if (userData.role === 'admin') {
-                            // Show admin-specific UI elements
-                        }
-
-                        toggleAuthUI(true);
-                    } else {
-                        console.log('No such user data in Firestore');
-                    }
+                    console.log('User logged in:', user);
+                    toggleAuthUI(true);
                 })
                 .catch((error) => {
                     console.error('Error logging in:', error);
                     alert('Login failed: ' + error.message);
                 });
         }
-
-    // Sign Up function
-function signUp() {
-    const username = document.getElementById('username').value;
-    const email = document.getElementById('signup-email').value;
-    const companyName = document.getElementById('vendor').value.toUpperCase(); // Ensure companyName is in uppercase
-    const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-    
-    // Validate input fields
-    if (!username || !email || !companyName || !password || !confirmPassword) {
-        alert('All fields are required.');
-        return;
-    }
-
-    if (password !== confirmPassword) {
-        alert('Passwords do not match.');
-        return;
-    }
-
-    // Create user with Firebase Authentication
-    auth.createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-
-            // Store user details in Firestore under companies > companyName > users subcollection
-            return db.collection('companies').doc(companyName).collection('users').doc(user.uid).set({
-                username: username,
-                email: email,
-                role: 'user' // Default role
-            });
-            
-        })
-        .then(() => {
-            console.log('User signed up and data stored in Firestore');
-            toggleAuthUI(true);
-        })
-        .catch((error) => {
-            console.error('Error signing up:', error);
-            alert('Sign up failed: ' + error.message);
-        });
-}
-
 
         // Logout function
         function logout() {
@@ -173,32 +269,21 @@ function signUp() {
             });
         }
 
-        // Toggle between login and sign-up forms
-        function toggleToSignUp() {
-            document.getElementById('login-container').style.display = 'none';
-            document.getElementById('signup-container').style.display = 'block';
-        }
-
-        function toggleToLogin() {
-            document.getElementById('signup-container').style.display = 'none';
-            document.getElementById('login-container').style.display = 'block';
-        }
-        
         // Toggle UI based on auth state
         function toggleAuthUI(isLoggedIn) {
             document.getElementById('login-container').style.display = isLoggedIn ? 'none' : 'block';
-            document.getElementById('signup-container').style.display = 'none'; // Hide sign-up when logged in
+            document.getElementById('select-signup-type').style.display = 'none';
+            document.getElementById('entrepreneur-signup-form').style.display = 'none';
+            document.getElementById('user-signup-form').style.display = 'none';
             document.getElementById('logout-container').style.display = isLoggedIn ? 'block' : 'none';
         }
-        
+
         // Monitor auth state
         auth.onAuthStateChanged((user) => {
             if (user) {
-                // User is signed in
                 console.log('User is logged in:', user);
                 toggleAuthUI(true);
             } else {
-                // No user is signed in
                 console.log('No user is logged in');
                 toggleAuthUI(false);
             }
