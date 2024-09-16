@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Collapsible Sidebar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+ /* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    background: #f0f2f5;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px; /* Default width */
+    background-color: #ffffff;
+    color: #4a4a4a;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    transition: width 0.3s ease; /* Smooth transition for width */
+    position: fixed;
+    left: 0; /* Ensure the sidebar stays on the left */
+    height: 100vh; /* Full height */
+    z-index: 1000; /* Ensure sidebar is above other elements */
+}
+
+.sidebar.collapsed {
+    width: 80px; /* Width when collapsed */
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f5f6fa;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: opacity 0.3s ease; /* Smooth transition for logo visibility */
+}
+
+.logo i {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #3498db;
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4a4a4a;
+    transition: opacity 0.3s ease; /* Smooth transition for text visibility */
+}
+
+.sidebar.collapsed .logo-text {
+    opacity: 0; /* Hide logo text when collapsed */
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4a4a4a;
+    font-size: 20px;
+    outline: none;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.menu-item {
+    position: relative;
+}
+
+.menu-item a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #4a4a4a;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu-item a:hover {
+    background-color: #e0e4e8;
+    border-radius: 8px;
+    color: #3498db; /* Highlight color */
+}
+
+.menu-text {
+    margin-left: 15px;
+    white-space: nowrap; /* Prevent text wrapping */
+    transition: opacity 0.3s ease; /* Smooth transition for text visibility */
+}
+
+.sidebar.collapsed .menu-text {
+    opacity: 0; /* Hide menu text when collapsed */
+}
+
+.badge {
+    background-color: #3498db;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+/* Submenu Styles */
+.submenu {
+    list-style: none;
+    padding-left: 0; /* Remove indentation */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.menu-item.open .submenu {
+    max-height: 500px; /* Adjust based on submenu content */
+}
+
+.submenu li a {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #f9f9f9; /* Submenu background */
+    color: #6c757d; /* Submenu text color */
+}
+
+.submenu li a:hover {
+    background-color: #e0e4e8;
+    color: #3498db;
+}
+
+/* Hide submenus when the sidebar is collapsed */
+.sidebar.collapsed .submenu {
+    display: none;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    background-color: #f5f6fa;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-left: 250px; /* Align to the right of the sidebar */
+    padding: 20px;
+    transition: margin-left 0.3s ease; /* Smooth transition for margin */
+    width: calc(100% - 250px); /* Full width minus the sidebar */
+}
+
+.sidebar.collapsed + .main-content {
+    margin-left: 80px; /* Adjust main content position when sidebar collapses */
+    width: calc(100% - 80px); /* Adjust width of main content */
+}
+
+/* Icons */
+.sidebar i, .sidebar-toggle i {
+    color: #4a4a4a;
+}
+
+/* Ensure full height scrolling */
+html, body {
+    height: 100%;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                <span class="logo-text">BUS PARTNER</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-home"></i><span class="menu-text">Home</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-envelope"></i><span class="menu-text">Contact</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-info-circle"></i><span class="menu-text">About</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-cogs"></i><span class="menu-text">Program</span></a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Attendance Record</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Document Expire</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Camera Record</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Bus Aranage Shift</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Maintenance Record</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-cog"></i><span class="menu-text">Settings</span></a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-user-cog"></i><span class="menu-text">Account Management</span></a></li>
+                    <li class="menu-item">
+                        <a href="#"><i class="fas fa-bus"></i><span class="menu-text">Driver Database</span></a>
+                        <ul class="submenu">
+                            <li><a href="#"><i class="fas fa-user-plus"></i><span class="menu-text">Driver Registering</span></a></li>
+                            <li><a href="#"><i class="fas fa-id-card"></i><span class="menu-text">Driver Data</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#"><i class="fas fa-database"></i><span class="menu-text">Bus Database</span></a>
+                        <ul class="submenu">
+                            <li><a href="#"><i class="fas fa-bus-alt"></i><span class="menu-text">Bus Registering</span></a></li>
+                            <li><a href="#"><i class="fas fa-clipboard-list"></i><span class="menu-text">Bus Data</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-tools"></i><span class="menu-text">Admin Tools</span></a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Admin Account Management</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-user"></i><span class="menu-text">Profile</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-sign-in-alt"></i><span class="menu-text">Login/Logout</span></a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <h1>Welcome to Projeck</h1>
+        <p>This is the homepage of your dashboard.</p>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
+
+        // Close all submenus when collapsing the sidebar
+        if (sidebar.classList.contains('collapsed')) {
+            document.querySelectorAll('.submenu').forEach(submenu => {
+                submenu.style.maxHeight = null;
+                submenu.parentElement.classList.remove('open');
+            });
+        }
+    });
+
+    // Toggle submenus
+    const menuItems = document.querySelectorAll('.menu-item > a');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(event) {
+            const submenu = this.nextElementSibling;
+
+            if (submenu && submenu.classList.contains('submenu')) {
+                event.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
+
+                // Toggle max-height for smooth animation
+                if (parent.classList.contains('open')) {
+                    submenu.style.maxHeight = submenu.scrollHeight + "px";
+                } else {
+                    submenu.style.maxHeight = null;
+                }
+            }
+        });
+    });
+});
+
+    </script> <!-- Link to your JavaScript file -->
+</body>
+</html>
