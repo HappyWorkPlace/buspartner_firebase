@@ -13,14 +13,13 @@
     <script>
         // Your Firebase Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyC0sUp9IJILTAV4Qx7AHK6dugESDF5NWHA",
-            authDomain: "buspartner-3aa7f.firebaseapp.com",
-            databaseURL: "https://buspartner-3aa7f-default-rtdb.firebaseio.com",
-            projectId: "buspartner-3aa7f",
-            storageBucket: "buspartner-3aa7f.appspot.com",
-            messagingSenderId: "482507801367",
-            appId: "1:482507801367:web:fd3329c1cc6bac15bbed52",
-            measurementId: "G-5J3H0PFV2Y"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID",
+            measurementId: "YOUR_MEASUREMENT_ID"
         };
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -29,16 +28,24 @@
 
         let currentCompanyNo = '';
 
-        // Load current permissions for the selected role
+        // Load allowed menus and current permissions for the selected role
         function loadPermissions(role) {
             if (!currentCompanyNo) return;
+            
+            // Load allowed menus first
             db.collection('companies').doc(currentCompanyNo).get().then(doc => {
                 if (doc.exists) {
                     const companyData = doc.data();
+                    const allowedMenus = companyData.godModeSettings ? companyData.godModeSettings.allowedMenus : [];
+                    
+                    // Display only allowed menus
+                    displayAllowedMenus(allowedMenus);
+
+                    // Load current permissions for the selected role
                     const permissions = companyData.permissions || {};
                     const rolePermissions = permissions[role] || [];
 
-                    // Set checkboxes based on permissions
+                    // Set checkboxes based on current permissions
                     document.querySelectorAll('input.permission-checkbox').forEach(checkbox => {
                         checkbox.checked = rolePermissions.includes(checkbox.value);
                     });
@@ -46,7 +53,18 @@
                     console.log('No such document!');
                 }
             }).catch(error => {
-                console.error('Error getting document:', error);
+                console.error('Error getting company document:', error);
+            });
+        }
+
+        // Display only allowed menus
+        function displayAllowedMenus(allowedMenus) {
+            document.querySelectorAll('input.permission-checkbox').forEach(checkbox => {
+                if (allowedMenus.includes(checkbox.value)) {
+                    checkbox.parentElement.style.display = 'block'; // Show the menu
+                } else {
+                    checkbox.parentElement.style.display = 'none'; // Hide the menu
+                }
             });
         }
 
@@ -121,7 +139,7 @@
             </div>
             <div class="mt-2">
                 <label class="inline-flex items-center">
-                    <input type="checkbox" class="permission-checkbox" value="accountmanagement">
+                    <input type="checkbox" class="permission-checkbox" value="user-management">
                     <span class="ml-2">User Management</span>
                 </label>
             </div>
