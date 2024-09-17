@@ -1,4 +1,5 @@
 // checkAccess.js
+
 // Function to check access based on permission
 function checkAccess(permission) {
     return new Promise((resolve, reject) => {
@@ -22,25 +23,17 @@ function checkAccess(permission) {
                                     if (permissions[userRole] && permissions[userRole].includes(permission)) {
                                         // อนุญาตให้เข้าถึงหน้า
                                         console.log('Access granted to:', permission);
-                                        // แสดงส่วนที่คุณต้องการให้แสดงเมื่อได้รับอนุญาต
-                                        // ตรวจสอบว่า `id` นั้นถูกต้อง
-                                        let contentDiv = document.getElementById('account-management-container');
-                                        if (contentDiv) {
-                                            contentDiv.style.display = 'block'; // แสดงเนื้อหาหน้า
-                                        } else {
-                                            console.error("Element with ID 'account-management-container' not found.");
-                                        }
-                                        resolve(true);
+                                        resolve({ accessGranted: true, allowedMenus: companyData.godModeSettings.allowedMenus });
                                     } else {
                                         // ปฏิเสธการเข้าถึง
                                         console.log('Access denied to:', permission);
                                         alert('You do not have permission to access this page.');
                                         window.location.href = 'login.html'; // Redirect to login page or another page
-                                        resolve(false);
+                                        resolve({ accessGranted: false });
                                     }
                                 } else {
                                     console.error('Company document not found.');
-                                    resolve(false);
+                                    resolve({ accessGranted: false });
                                 }
                             }).catch(error => {
                                 console.error('Error getting company document:', error);
@@ -49,7 +42,7 @@ function checkAccess(permission) {
                         });
                     } else {
                         console.log("User not found in any company.");
-                        resolve(false);
+                        resolve({ accessGranted: false });
                     }
                 }).catch(error => {
                     console.error('Error querying users:', error);
@@ -58,7 +51,7 @@ function checkAccess(permission) {
             } else {
                 // หากผู้ใช้ไม่ได้ล็อกอิน
                 window.location.href = 'login.html'; // Redirect to login page
-                resolve(false);
+                resolve({ accessGranted: false });
             }
         });
     });
@@ -75,10 +68,13 @@ function getPermissionFromURL() {
 // เรียกใช้ checkAccess พร้อม permission ที่ได้จาก URL
 window.onload = function() {
     let permission = getPermissionFromURL();
-    checkAccess(permission).then(accessGranted => {
-        if (!accessGranted) {
+    checkAccess(permission).then(result => {
+        if (!result.accessGranted) {
             console.log('Access denied. Redirecting to login page...');
             window.location.href = 'login.html'; // Redirect to login page
+        } else {
+            // ถ้าเข้าถึงได้ แสดงเมนูที่อนุญาต
+            displayAllowedMenus(result.allowedMenus);
         }
     }).catch(error => {
         console.error('Error in checkAccess:', error);
