@@ -23,6 +23,7 @@ function checkAccess(permission) {
                                     if (permissions[userRole] && permissions[userRole].includes(permission)) {
                                         // อนุญาตให้เข้าถึงหน้า
                                         console.log('Access granted to:', permission);
+                                        // ส่งคืนค่า allowedMenus ด้วย
                                         resolve({ accessGranted: true, allowedMenus: companyData.godModeSettings.allowedMenus });
                                     } else {
                                         // ปฏิเสธการเข้าถึง
