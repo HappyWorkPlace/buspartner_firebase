@@ -77,70 +77,90 @@
         let currentCompanyNo = '';
         let currentUserId = '';
 
-        // Load user data and populate the table
-        function loadUserData() {
-            console.log("Starting to load user data...");
-            // Get the logged-in user's company information
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    console.log("User is logged in:", user.email);
-                    db.collectionGroup('users').where('email', '==', user.email).get()
-                        .then((querySnapshot) => {
-                            if (querySnapshot.empty) {
-                                console.log("No user found in the company with the current email.");
-                            }
-                            querySnapshot.forEach((doc) => {
-                                const userData = doc.data();
-                                console.log("User data retrieved:", userData);
-                                currentCompanyNo = userData.Company_No;
+function loadUserData() {
+    console.log("Starting to load user data...");
+    // Get the logged-in user's company information
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            console.log("User is logged in:", user.email);
+            db.collectionGroup('users').where('email', '==', user.email).get()
+                .then((querySnapshot) => {
+                    if (querySnapshot.empty) {
+                        console.log("No user found in the company with the current email.");
+                    }
+                    querySnapshot.forEach((doc) => {
+                        const userData = doc.data();
+                        console.log("User data retrieved:", userData);
+                        currentCompanyNo = userData.Company_No;
 
-                                // Check if the user has admin privileges
-                                if (userData.role === 'admin' || userData.role === 'Entrepreneur') {
-                                    console.log("User has admin privileges.");
-                                    // Load all users in the same company
-                                    db.collection('companies').doc(currentCompanyNo).collection('users').get()
-                                        .then((snapshot) => {
-                                            const userTableBody = document.getElementById('user-table-body');
-                                            userTableBody.innerHTML = ''; // Clear existing rows
-                                            if (snapshot.empty) {
-                                                console.log("No users found in the company.");
-                                            }
-                                            snapshot.forEach((userDoc) => {
-                                                const user = userDoc.data();
-                                                console.log("User in company:", user);
-                                                // Create table row
-                                                const tr = document.createElement('tr');
-                                                tr.innerHTML = `
-                                                    <td class="py-2">${user.username}</td>
-                                                    <td class="py-2">${user.email}</td>
-                                                    <td class="py-2">${user.role}</td>
-                                                    <td class="py-2">
-                                                        <button onclick="editUserRole('${userDoc.id}', '${user.role}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Edit</button>
-                                                        <button onclick="deleteUser('${userDoc.id}')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">Delete</button>
-                                                    </td>
-                                                `;
-                                                userTableBody.appendChild(tr);
-                                            });
-                                            // Show account management container
-                                            document.getElementById('account-management-container').style.display = 'block';
-                                        }).catch((error) => {
-                                            console.error("Error getting users in company:", error);
-                                        });
+                        // Check if the user has the 'account-management' permission
+                        db.collection('companies').doc(currentCompanyNo).get()
+                            .then((companyDoc) => {
+                                if (companyDoc.exists) {
+                                    const companyData = companyDoc.data();
+                                    const userPermissions = companyData.permissions[userData.role] || [];
+                                    console.log("User permissions:", userPermissions);
+
+                                    if (userPermissions.includes('account-management')) {
+                                        console.log("User has permission to manage accounts.");
+                                        // Load all users in the same company
+                                        loadCompanyUsers();
+                                    } else {
+                                        console.log("User does not have permission to manage accounts.");
+                                        alert('You do not have permission to manage accounts.');
+                                        logout();
+                                    }
                                 } else {
-                                    console.log("User does not have admin privileges.");
-                                    alert('You do not have permission to manage accounts.');
+                                    console.log("No such company document!");
+                                    alert('Company data not found.');
                                     logout();
                                 }
+                            })
+                            .catch((error) => {
+                                console.error("Error getting company data:", error);
                             });
-                        }).catch((error) => {
-                            console.error("Error querying users:", error);
-                        });
-                } else {
-                    console.log("No user is logged in, redirecting to login page.");
-                    window.location.href = 'login.html'; // Redirect to login page if not authenticated
-                }
-            });
+                    });
+                }).catch((error) => {
+                    console.error("Error querying users:", error);
+                });
+        } else {
+            console.log("No user is logged in, redirecting to login page.");
+            window.location.href = 'login.html'; // Redirect to login page if not authenticated
         }
+    });
+}
+
+// Separate function to load company users
+function loadCompanyUsers() {
+    db.collection('companies').doc(currentCompanyNo).collection('users').get()
+        .then((snapshot) => {
+            const userTableBody = document.getElementById('user-table-body');
+            userTableBody.innerHTML = ''; // Clear existing rows
+            if (snapshot.empty) {
+                console.log("No users found in the company.");
+            }
+            snapshot.forEach((userDoc) => {
+                const user = userDoc.data();
+                console.log("User in company:", user);
+                // Create table row
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2">${user.username}</td>
+                    <td class="py-2">${user.email}</td>
+                    <td class="py-2">${user.role}</td>
+                    <td class="py-2">
+                        <button onclick="editUserRole('${userDoc.id}', '${user.role}')" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Edit</button>
+                        <button onclick="deleteUser('${userDoc.id}')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition duration-200">Delete</button>
+                    </td>
+                `;
+                userTableBody.appendChild(tr);
+            });
+            // Show account management container
+            document.getElementById('account-management-container').style.display = 'block';
+        }).catch((error) => {
+            console.error("Error getting users in company:", error);
+        });
+}
 
         // Edit user role
         function editUserRole(userId, currentRole) {
