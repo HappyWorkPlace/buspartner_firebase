@@ -74,62 +74,45 @@
     </div>
 
     <script>
-        let currentCompanyNo = '';
-        let currentUserId = '';
+        // ฟังก์ชันที่จะถูกเรียกเมื่อหน้าถูกโหลด
+        window.onload = function() {
+            let permission = 'accountmanagement'; // ตั้งค่า permission ที่ต้องการตรวจสอบ
+            checkAccess(permission).then(accessGranted => {
+                if (accessGranted) {
+                    // ถ้าได้รับสิทธิ์เข้าถึงให้เรียกฟังก์ชัน loadUserData()
+                    loadUserData();
+                } else {
+                    // ถ้าไม่ได้รับสิทธิ์เข้าถึง ให้ redirect ไปยังหน้าอื่น
+                    window.location.href = 'login.html'; // Redirect to login page
+                }
+            });
+        };
 
-function loadUserData() {
-    console.log("Starting to load user data...");
-    // Get the logged-in user's company information
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            console.log("User is logged in:", user.email);
-            db.collectionGroup('users').where('email', '==', user.email).get()
-                .then((querySnapshot) => {
-                    if (querySnapshot.empty) {
-                        console.log("No user found in the company with the current email.");
-                    }
-                    querySnapshot.forEach((doc) => {
-                        const userData = doc.data();
-                        console.log("User data retrieved:", userData);
-                        currentCompanyNo = userData.Company_No;
-
-                        // Check if the user has the 'account-management' permission
-                        db.collection('companies').doc(currentCompanyNo).get()
-                            .then((companyDoc) => {
-                                if (companyDoc.exists) {
-                                    const companyData = companyDoc.data();
-                                    const userPermissions = companyData.permissions[userData.role] || [];
-                                    console.log("User permissions:", userPermissions);
-
-                                    if (userPermissions.includes('account-management')) {
-                                        console.log("User has permission to manage accounts.");
-                                        // Load all users in the same company
-                                        loadCompanyUsers();
-                                    } else {
-                                        console.log("User does not have permission to manage accounts.");
-                                        alert('You do not have permission to manage accounts.');
-                                        logout();
-                                    }
-                                } else {
-                                    console.log("No such company document!");
-                                    alert('Company data not found.');
-                                    logout();
-                                }
-                            })
-                            .catch((error) => {
-                                console.error("Error getting company data:", error);
+        // Load user data and populate the table
+        function loadUserData() {
+            console.log("Starting to load user data...");
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    console.log("User is logged in:", user.email);
+                    db.collectionGroup('users').where('email', '==', user.email).get()
+                        .then((querySnapshot) => {
+                            if (querySnapshot.empty) {
+                                console.log("No user found in the company with the current email.");
+                            }
+                            querySnapshot.forEach((doc) => {
+                                const userData = doc.data();
+                                currentCompanyNo = userData.Company_No;
+                                loadCompanyUsers();
                             });
-                    });
-                }).catch((error) => {
-                    console.error("Error querying users:", error);
-                });
-        } else {
-            console.log("No user is logged in, redirecting to login page.");
-            window.location.href = 'login.html'; // Redirect to login page if not authenticated
+                        }).catch((error) => {
+                            console.error("Error querying users:", error);
+                        });
+                } else {
+                    console.log("No user is logged in, redirecting to login page.");
+                    window.location.href = 'login.html'; // Redirect to login page if not authenticated
+                }
+            });
         }
-    });
-}
-
 // Separate function to load company users
 function loadCompanyUsers() {
     db.collection('companies').doc(currentCompanyNo).collection('users').get()
