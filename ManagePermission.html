@@ -63,15 +63,35 @@ function loadPermissions(role) {
 
 
         // Display only allowed menus
-        function displayAllowedMenus(allowedMenus) {
-            document.querySelectorAll('input.permission-checkbox').forEach(checkbox => {
-                if (allowedMenus.includes(checkbox.value)) {
-                    checkbox.parentElement.style.display = 'block'; // Show the menu
-                } else {
-                    checkbox.parentElement.style.display = 'none'; // Hide the menu
-                }
-            });
-        }
+function displayAllowedMenus(allowedMenus) {
+    // ล้าง checkbox เดิมออก
+    const permissionsContainer = document.querySelector('.permissions-container');
+    permissionsContainer.innerHTML = ''; // เคลียร์เนื้อหาเดิม
+
+    // สร้าง checkbox สำหรับเมนูที่ได้รับอนุญาต
+    allowedMenus.forEach(menu => {
+        const menuDiv = document.createElement('div');
+        menuDiv.classList.add('mt-2');
+
+        const label = document.createElement('label');
+        label.classList.add('inline-flex', 'items-center');
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.classList.add('permission-checkbox');
+        checkbox.value = menu;
+
+        const span = document.createElement('span');
+        span.classList.add('ml-2');
+        span.textContent = menu; // หรือคุณอาจเปลี่ยนชื่อให้เป็นมิตรกับผู้ใช้ได้
+
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        menuDiv.appendChild(label);
+        permissionsContainer.appendChild(menuDiv);
+    });
+}
+
 
         // Save updated permissions
         function savePermissions() {
@@ -136,25 +156,9 @@ function loadPermissions(role) {
         <!-- Permissions -->
         <div class="mb-4">
             <h3 class="text-lg font-medium text-gray-700">Permissions</h3>
-            <div class="mt-2">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" class="permission-checkbox" value="dashboard">
-                    <span class="ml-2">Dashboard</span>
-                </label>
+            <div class="permissions-container">
+                <!-- ส่วนนี้จะถูกเติมด้วย JavaScript -->
             </div>
-            <div class="mt-2">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" class="permission-checkbox" value="user-management">
-                    <span class="ml-2">User Management</span>
-                </label>
-            </div>
-            <div class="mt-2">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" class="permission-checkbox" value="reports">
-                    <span class="ml-2">Reports</span>
-                </label>
-            </div>
-            <!-- Add more permissions as needed -->
         </div>
 
         <!-- Save Button -->
