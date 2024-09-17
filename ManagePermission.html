@@ -31,22 +31,23 @@ const firebaseConfig = {
         let currentCompanyNo = '';
 
     // ฟังก์ชันที่จะถูกเรียกเมื่อหน้าถูกโหลด
-    window.onload = function() {
-        let permission = 'ManagePermission'; // ตั้งค่า permission ที่ต้องการตรวจสอบ
-        checkAccess(permission).then(accessGranted => {
-            if (accessGranted) {
-                // ถ้าได้รับสิทธิ์เข้าถึงให้เรียกฟังก์ชัน loadUserData()
-                displayAllowedMenus(allowedMenus)();
-            } else {
-                // ถ้าไม่ได้รับสิทธิ์เข้าถึง ให้ redirect ไปยังหน้าอื่น
-                window.location.href = 'login.html'; // Redirect to login page
-            }
-        }).catch(error => {
-            console.error("Error in checkAccess:", error);
-            alert('An error occurred while checking access. Please try again.');
+window.onload = function() {
+    let permission = 'ManagePermission'; // ตั้งค่า permission ที่ต้องการตรวจสอบ
+    checkAccess(permission).then(result => {
+        if (result.accessGranted) {
+            // ถ้าได้รับสิทธิ์เข้าถึงให้เรียกฟังก์ชัน displayAllowedMenus() พร้อมกับ allowedMenus
+            displayAllowedMenus(result.allowedMenus);
+        } else {
+            // ถ้าไม่ได้รับสิทธิ์เข้าถึง ให้ redirect ไปยังหน้าอื่น
             window.location.href = 'login.html'; // Redirect to login page
-        });
-    };// Display only allowed menus
+        }
+    }).catch(error => {
+        console.error("Error in checkAccess:", error);
+        alert('An error occurred while checking access. Please try again.');
+        window.location.href = 'login.html'; // Redirect to login page
+    });
+};
+
 function displayAllowedMenus(allowedMenus) {
     // ล้าง checkbox เดิมออก
     const permissionsContainer = document.querySelector('.permissions-container');
