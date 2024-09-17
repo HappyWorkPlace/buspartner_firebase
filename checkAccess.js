@@ -22,7 +22,14 @@ function checkAccess(permission) {
                                     if (permissions[userRole] && permissions[userRole].includes(permission)) {
                                         // อนุญาตให้เข้าถึงหน้า
                                         console.log('Access granted to:', permission);
-                                        document.getElementById('content').style.display = 'block'; // แสดงเนื้อหาหน้า
+                                        // แสดงส่วนที่คุณต้องการให้แสดงเมื่อได้รับอนุญาต
+                                        // ตรวจสอบว่า `id` นั้นถูกต้อง
+                                        let contentDiv = document.getElementById('account-management-container');
+                                        if (contentDiv) {
+                                            contentDiv.style.display = 'block'; // แสดงเนื้อหาหน้า
+                                        } else {
+                                            console.error("Element with ID 'account-management-container' not found.");
+                                        }
                                         resolve(true);
                                     } else {
                                         // ปฏิเสธการเข้าถึง
@@ -31,10 +38,22 @@ function checkAccess(permission) {
                                         window.location.href = 'login.html'; // Redirect to login page or another page
                                         resolve(false);
                                     }
+                                } else {
+                                    console.error('Company document not found.');
+                                    resolve(false);
                                 }
+                            }).catch(error => {
+                                console.error('Error getting company document:', error);
+                                reject(error);
                             });
                         });
+                    } else {
+                        console.log("User not found in any company.");
+                        resolve(false);
                     }
+                }).catch(error => {
+                    console.error('Error querying users:', error);
+                    reject(error);
                 });
             } else {
                 // หากผู้ใช้ไม่ได้ล็อกอิน
@@ -44,7 +63,6 @@ function checkAccess(permission) {
         });
     });
 }
-
 
 // ฟังก์ชันสำหรับดึง permission จาก URL
 function getPermissionFromURL() {
@@ -57,5 +75,14 @@ function getPermissionFromURL() {
 // เรียกใช้ checkAccess พร้อม permission ที่ได้จาก URL
 window.onload = function() {
     let permission = getPermissionFromURL();
-    checkAccess(permission);
+    checkAccess(permission).then(accessGranted => {
+        if (!accessGranted) {
+            console.log('Access denied. Redirecting to login page...');
+            window.location.href = 'login.html'; // Redirect to login page
+        }
+    }).catch(error => {
+        console.error('Error in checkAccess:', error);
+        alert('An error occurred while checking access. Please try again.');
+        window.location.href = 'login.html'; // Redirect to login page
+    });
 };
