@@ -30,37 +30,23 @@ const firebaseConfig = {
 
         let currentCompanyNo = '';
 
-        // Load allowed menus and current permissions for the selected role
-function loadPermissions(role) {
-    if (!currentCompanyNo) return;
-    
-    // Load allowed menus first
-    db.collection('companies').doc(currentCompanyNo).get().then(doc => {
-        if (doc.exists) {
-            const companyData = doc.data();
-            const allowedMenus = companyData.godModeSettings ? companyData.godModeSettings.allowedMenus : [];
-            console.log('Allowed Menus:', allowedMenus); // ตรวจสอบ allowedMenus
-
-            // Display only allowed menus
-            displayAllowedMenus(allowedMenus);
-
-            // Load current permissions for the selected role
-            const permissions = companyData.permissions || {};
-            const rolePermissions = permissions[role] || [];
-            console.log('Role Permissions:', rolePermissions); // ตรวจสอบ rolePermissions
-
-            // Set checkboxes based on current permissions
-            document.querySelectorAll('input.permission-checkbox').forEach(checkbox => {
-                checkbox.checked = rolePermissions.includes(checkbox.value);
-            });
-        } else {
-            console.log('No such document!');
-        }
-    }).catch(error => {
-        console.error('Error getting company document:', error);
-    });
-}
-
+    // ฟังก์ชันที่จะถูกเรียกเมื่อหน้าถูกโหลด
+    window.onload = function() {
+        let permission = 'ManagePermission'; // ตั้งค่า permission ที่ต้องการตรวจสอบ
+        checkAccess(permission).then(accessGranted => {
+            if (accessGranted) {
+                // ถ้าได้รับสิทธิ์เข้าถึงให้เรียกฟังก์ชัน loadUserData()
+                displayAllowedMenus(allowedMenus)();
+            } else {
+                // ถ้าไม่ได้รับสิทธิ์เข้าถึง ให้ redirect ไปยังหน้าอื่น
+                window.location.href = 'login.html'; // Redirect to login page
+            }
+        }).catch(error => {
+            console.error("Error in checkAccess:", error);
+            alert('An error occurred while checking access. Please try again.');
+            window.location.href = 'login.html'; // Redirect to login page
+        });
+    };
 
         // Display only allowed menus
 function displayAllowedMenus(allowedMenus) {
