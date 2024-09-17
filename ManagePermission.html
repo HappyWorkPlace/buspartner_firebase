@@ -46,12 +46,15 @@ const firebaseConfig = {
             alert('An error occurred while checking access. Please try again.');
             window.location.href = 'login.html'; // Redirect to login page
         });
-    };
-
-        // Display only allowed menus
+    };// Display only allowed menus
 function displayAllowedMenus(allowedMenus) {
     // ล้าง checkbox เดิมออก
     const permissionsContainer = document.querySelector('.permissions-container');
+    if (!permissionsContainer) {
+        console.error('Permissions container not found.');
+        return;
+    }
+    
     permissionsContainer.innerHTML = ''; // เคลียร์เนื้อหาเดิม
 
     // สร้าง checkbox สำหรับเมนูที่ได้รับอนุญาต
@@ -77,7 +80,6 @@ function displayAllowedMenus(allowedMenus) {
         permissionsContainer.appendChild(menuDiv);
     });
 }
-
 
         // Save updated permissions
         function savePermissions() {
