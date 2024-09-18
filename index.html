@@ -1,280 +1,308 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Driver Database</title>
-  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
-  <style>
-    body { font-family: 'Inter', sans-serif; }
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .table-container {
-      max-height: 70vh;
-      max-width: 1200px;
-      width: 100%;
-      overflow-y: auto;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-      margin: 1rem auto;
-    }
-    .sticky-header {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background-color: #1e40af;
-      color: white;
-    }
-    table {
-      width: 100%;
-      margin: auto;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-    th, td {
-      text-align: left;
-      padding: 12px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    th {
-      background-color: #1e40af;
-      font-weight: 600;
-    }
-    tbody tr:hover {
-      background-color: #f3f4f6;
-    }
-    #search-input {
-      outline: none;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      padding: 8px 12px;
-      width: 300px;
-    }
-    .search-box {
-      flex-grow: 1;
-      margin-right: 1rem;
-    }
-    .data-count-box {
-      background-color: #1e40af;
-      color: white;
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
-      text-align: center;
-      width: fit-content;
-    }
-    .title {
-      text-align: center;
-      color: #1e40af;
-      margin-top: 1rem;
-      margin-bottom: 1rem;
-      font-size: 2.5rem;
-      font-weight: bold;
-    }
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 1;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      overflow: auto;
-      background-color: rgba(0,0,0,0.4);
-    }
-    .modal-content {
-      background-color: #fefefe;
-      margin: 15% auto;
-      padding: 20px;
-      border: 1px solid #888;
-      width: 80%;
-      max-width: 500px;
-      border-radius: 8px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    .close {
-      color: #aaa;
-      float: right;
-      font-size: 28px;
-      font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-      color: black;
-      text-decoration: none;
-      cursor: pointer;
-    }
-    .expire-warning {
-      color: orange;
-    }
-    .expire-danger {
-      color: red;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Collapsible Sidebar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+    <style>
+ /* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    background: #f0f2f5;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px; /* Default width */
+    background-color: #ffffff;
+    color: #4a4a4a;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    transition: width 0.3s ease; /* Smooth transition for width */
+    position: fixed;
+    left: 0; /* Ensure the sidebar stays on the left */
+    height: 100vh; /* Full height */
+    z-index: 1000; /* Ensure sidebar is above other elements */
+}
+
+.sidebar.collapsed {
+    width: 80px; /* Width when collapsed */
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background-color: #f5f6fa;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    transition: opacity 0.3s ease; /* Smooth transition for logo visibility */
+}
+
+.logo i {
+    font-size: 20px;
+    margin-right: 10px;
+    color: #3498db;
+}
+
+.logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #4a4a4a;
+    transition: opacity 0.3s ease; /* Smooth transition for text visibility */
+}
+
+.sidebar.collapsed .logo-text {
+    opacity: 0; /* Hide logo text when collapsed */
+}
+
+.sidebar-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4a4a4a;
+    font-size: 20px;
+    outline: none;
+}
+
+/* Sidebar Menu */
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+}
+
+.menu-item {
+    position: relative;
+}
+
+.menu-item a {
+    padding: 15px 20px;
+    text-decoration: none;
+    color: #4a4a4a;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.menu-item a:hover {
+    background-color: #e0e4e8;
+    border-radius: 8px;
+    color: #3498db; /* Highlight color */
+}
+
+.menu-text {
+    margin-left: 15px;
+    white-space: nowrap; /* Prevent text wrapping */
+    transition: opacity 0.3s ease; /* Smooth transition for text visibility */
+}
+
+.sidebar.collapsed .menu-text {
+    opacity: 0; /* Hide menu text when collapsed */
+}
+
+.badge {
+    background-color: #3498db;
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+/* Submenu Styles */
+.submenu {
+    list-style: none;
+    padding-left: 0; /* Remove indentation */
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.menu-item.open .submenu {
+    max-height: 500px; /* Adjust based on submenu content */
+}
+
+.submenu li a {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #f9f9f9; /* Submenu background */
+    color: #6c757d; /* Submenu text color */
+}
+
+.submenu li a:hover {
+    background-color: #e0e4e8;
+    color: #3498db;
+}
+
+/* Hide submenus when the sidebar is collapsed */
+.sidebar.collapsed .submenu {
+    display: none;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    background-color: #f5f6fa;
+    box-shadow: 0 -1px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Main Content Styles */
+.main-content {
+    margin-left: 250px; /* Align to the right of the sidebar */
+    padding: 20px;
+    transition: margin-left 0.3s ease; /* Smooth transition for margin */
+    width: calc(100% - 250px); /* Full width minus the sidebar */
+}
+
+.sidebar.collapsed + .main-content {
+    margin-left: 80px; /* Adjust main content position when sidebar collapses */
+    width: calc(100% - 80px); /* Adjust width of main content */
+}
+
+/* Icons */
+.sidebar i, .sidebar-toggle i {
+    color: #4a4a4a;
+}
+
+/* Ensure full height scrolling */
+html, body {
+    height: 100%;
+}
+
+    </style>
 </head>
-<body class="bg-gray-100 p-6">
-  <div class="title">Driver Database</div>
-  <div class="header-container">
-    <div class="search-box">
-      <input type="text" id="search-input" placeholder="Search by EmpNo or Driver Name"
-             class="shadow-sm" oninput="search()">
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-project-diagram"></i>
+                <span class="logo-text">BUS PARTNER</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebar-toggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Menu -->
+        <ul class="sidebar-menu">
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-home"></i><span class="menu-text">Home</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-envelope"></i><span class="menu-text">Contact</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-info-circle"></i><span class="menu-text">About</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-cogs"></i><span class="menu-text">Program</span></a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Attendance Record</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Document Expire</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Camera Record</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Bus Aranage Shift</span></a></li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Maintenance Record</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-cog"></i><span class="menu-text">Settings</span></a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-user-cog"></i><span class="menu-text">Account Management</span></a></li>
+                    <li class="menu-item">
+                        <a href="#"><i class="fas fa-bus"></i><span class="menu-text">Driver Database</span></a>
+                        <ul class="submenu">
+                            <li><a href="#"><i class="fas fa-user-plus"></i><span class="menu-text">Driver Registering</span></a></li>
+                            <li><a href="#"><i class="fas fa-id-card"></i><span class="menu-text">Driver Data</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#"><i class="fas fa-database"></i><span class="menu-text">Bus Database</span></a>
+                        <ul class="submenu">
+                            <li><a href="#"><i class="fas fa-bus-alt"></i><span class="menu-text">Bus Registering</span></a></li>
+                            <li><a href="#"><i class="fas fa-clipboard-list"></i><span class="menu-text">Bus Data</span></a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-tools"></i><span class="menu-text">Admin Tools</span></a>
+                <ul class="submenu">
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span class="menu-text">Admin Account Management</span></a></li>
+                </ul>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-user"></i><span class="menu-text">Profile</span></a>
+            </li>
+            <li class="menu-item">
+                <a href="#"><i class="fas fa-sign-in-alt"></i><span class="menu-text">Login/Logout</span></a>
+            </li>
+        </ul>
     </div>
-    <div class="data-count-box" id="data-count">
-      Rows: 0
+
+    <!-- Main Content -->
+    <div class="main-content" id="main-content">
+        <h1>Welcome to Projeck</h1>
+        <p>This is the homepage of your dashboard.</p>
     </div>
-  </div>
-  <div class="table-container">
-    <table>
-      <thead class="sticky-header">
-        <tr>
-          <th>EmpNo</th>
-          <th>DriverName</th>
-          <th>Vendor</th>
-          <th>Age</th>
-          <th>JoinDate</th>
-          <th>LicenceExpire</th>
-          <th>PlateID</th>
-          <th>Route</th>
-          <th>Documents</th>
-        </tr>
-      </thead>
-      <tbody id="data-table">
-        <!-- Data rows will be dynamically inserted here -->
-      </tbody>
-    </table>
-  </div>
 
-  <div id="documentModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="modalTitle" class="text-xl font-bold mb-4"></h2>
-      <div id="modalContent"></div>
-    </div>
-  </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
 
-  <div id="editModal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <h2 id="editModalTitle" class="text-xl font-bold mb-4">Edit Driver Details</h2>
-      <form id="editForm">
-        <input type="hidden" id="editEmpNo">
-        <div class="mb-4">
-          <label for="editDriverName" class="block text-sm font-medium text-gray-700">Driver Name</label>
-          <input type="text" id="editDriverName" name="driverName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <div class="mb-4">
-          <label for="editVendor" class="block text-sm font-medium text-gray-700">Vendor</label>
-          <input type="text" id="editVendor" name="vendor" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <div class="mb-4">
-          <label for="editBirthDate" class="block text-sm font-medium text-gray-700">Birth Date</label>
-          <input type="date" id="editBirthDate" name="birthDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <div class="mb-4">
-          <label for="editJoinDate" class="block text-sm font-medium text-gray-700">Join Date</label>
-          <input type="date" id="editJoinDate" name="joinDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <div class="mb-4">
-          <label for="editLicenceExpire" class="block text-sm font-medium text-gray-700">Licence Expire</label>
-          <input type="date" id="editLicenceExpire" name="licenceExpire" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <div class="mb-4">
-          <label for="editPlateID" class="block text-sm font-medium text-gray-700">Plate ID</label>
-          <input type="text" id="editPlateID" name="plateID" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <div class="mb-4">
-          <label for="editRoute" class="block text-sm font-medium text-gray-700">Route</label>
-          <input type="text" id="editRoute" name="route" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
-        </div>
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Save Changes
-        </button>
-      </form>
-    </div>
-  </div>
+    sidebarToggle.addEventListener('click', function() {
+        sidebar.classList.toggle('collapsed');
+        mainContent.classList.toggle('collapsed');
 
-  <!-- Firebase Integration -->
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <!-- Firebase Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-  <script>
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyC0sUp9IJILTAV4Qx7AHK6dugESDF5NWHA",
-      authDomain: "buspartner-3aa7f.firebaseapp.com",
-      projectId: "buspartner-3aa7f",
-      storageBucket: "buspartner-3aa7f.appspot.com",
-      messagingSenderId: "482507801367",
-      appId: "1:482507801367:web:fd3329c1cc6bac15bbed52",
-      measurementId: "G-5J3H0PFV2Y"
-    };
-
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-
-    // Fetch driver data from Firestore
-    async function fetchDriverData() {
-      const dataTable = document.getElementById("data-table");
-      dataTable.innerHTML = "";
-      const driverDataRef = db.collection("driver_data");
-
-      try {
-        const snapshot = await driverDataRef.get();
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const tr = document.createElement("tr");
-
-          tr.innerHTML = `
-            <td>${data.emoNo || ''}</td>
-            <td>${data.name || ''}</td>
-            <td>${data.vendor || ''}</td>
-            <td>${data.birthDate ? new Date(data.birthDate.seconds * 1000).getFullYear() - new Date().getFullYear() : ''}</td>
-            <td>${data.joinDate ? new Date(data.joinDate.seconds * 1000).toLocaleDateString() : ''}</td>
-            <td>${data.licenceExpire ? new Date(data.licenceExpire.seconds * 1000).toLocaleDateString() : ''}</td>
-            <td>${data.PlateID || ''}</td>
-            <td>${data.route || ''}</td>
-            <td><button onclick="showDocumentDetails(this, 'docFile')">View Documents</button></td>
-          `;
-          dataTable.appendChild(tr);
-        });
-      } catch (error) {
-        console.error("Error fetching data: ", error);
-      }
-      updateRowCount();
-    }
-
-    // Handle search functionality
-    function search() {
-      const searchTerm = document.getElementById('search-input').value.toLowerCase();
-      const rows = document.querySelectorAll('#data-table tr');
-
-      rows.forEach(row => {
-        const empNo = row.cells[0].textContent.toLowerCase();
-        const driverName = row.cells[1].textContent.toLowerCase();
-
-        if (empNo.includes(searchTerm) || driverName.includes(searchTerm)) {
-          row.style.display = '';
-        } else {
-          row.style.display = 'none';
+        // Close all submenus when collapsing the sidebar
+        if (sidebar.classList.contains('collapsed')) {
+            document.querySelectorAll('.submenu').forEach(submenu => {
+                submenu.style.maxHeight = null;
+                submenu.parentElement.classList.remove('open');
+            });
         }
-      });
-      updateRowCount();
-    }
+    });
 
-    // Update row count
-    function updateRowCount() {
-      const visibleRows = document.querySelectorAll('#data-table tr:not([style*="display: none"])').length;
-      document.getElementById('data-count').textContent = `Rows: ${visibleRows}`;
-    }
+    // Toggle submenus
+    const menuItems = document.querySelectorAll('.menu-item > a');
+    menuItems.forEach(item => {
+        item.addEventListener('click', function(event) {
+            const submenu = this.nextElementSibling;
 
-    // Document ready event
-    document.addEventListener('DOMContentLoaded', fetchDriverData);
+            if (submenu && submenu.classList.contains('submenu')) {
+                event.preventDefault();
+                const parent = this.parentElement;
+                parent.classList.toggle('open');
 
-  </script>
+                // Toggle max-height for smooth animation
+                if (parent.classList.contains('open')) {
+                    submenu.style.maxHeight = submenu.scrollHeight + "px";
+                } else {
+                    submenu.style.maxHeight = null;
+                }
+            }
+        });
+    });
+});
+
+    </script> <!-- Link to your JavaScript file -->
 </body>
 </html>
