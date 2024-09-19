@@ -1,0 +1,28 @@
+<!-- register.html -->
+<style>
+    /* CSS ภายในของหน้าลงทะเบียน */
+    .register-container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+</style>
+
+<div class="register-container">
+    <h2>Register</h2>
+    <form id="register-form">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+        <button type="button" onclick="register()">Register</button>
+    </form>
+</div>
+
+<script>
+    // JavaScript สำหรับหน้าลงทะเบียน
+    function register() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        alert(`Registering user: ${username}`);
+    }
+</script>
